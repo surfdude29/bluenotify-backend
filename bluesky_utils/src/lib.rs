@@ -5,8 +5,12 @@ use serde_json::Value;
 use std::{collections::HashSet, error::Error};
 use tracing::{debug, error, info, warn};
 
-pub fn bluesky_browseable_url(handle: &str, rkey: &str) -> String {
-    format!("https://bsky.app/profile/{}/post/{}", handle, rkey)
+pub fn bluesky_browseable_url(handle: &str, rkey: &str, did: &str) -> String {
+    let mut user = handle.to_string();
+    if user == "handle.invalid" {
+        user = did.to_string();
+    }
+    format!("https://bsky.app/profile/{}/post/{}", user, rkey)
 }
 
 pub fn parse_uri(uri: &str) -> Option<(String, String)> {
@@ -346,5 +350,25 @@ mod tests {
             }
         }
 
+    }
+
+    #[test]
+    fn test_bluesky_browsable_url() {
+        let handle = "user123.com";
+        let rkey = "post456";
+        let did = "did:plc:abcdefg";
+
+        let url = bluesky_browseable_url(handle, rkey, did);
+        assert_eq!(url, "https://bsky.app/profile/user123.com/post/post456");
+    }
+
+    #[test]
+    fn test_bluesky_browsable_url_with_did() {
+        let handle = "handle.invalid";
+        let rkey = "post456";
+        let did = "did:plc:abcdefg";
+
+        let url = bluesky_browseable_url(handle, rkey, did);
+        assert_eq!(url, "https://bsky.app/profile/did:plc:abcdefg/post/post456");
     }
 }

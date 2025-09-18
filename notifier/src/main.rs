@@ -788,7 +788,7 @@ async fn process_post(
 
     let rkey = source_post.commit.rkey.clone();
 
-    let url = bluesky_browseable_url(&post_owner_handle, &rkey);
+    let url = bluesky_browseable_url(&post_owner_handle, &rkey, &source_post.did);
 
     if nats_message.is_some() {
         let ack = nats_message.unwrap().ack().await;
